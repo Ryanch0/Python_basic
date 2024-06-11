@@ -24,6 +24,6 @@ ff.close()
 
 def 구구단(n):
     for i in range(1,10):
-        print(n*i)
+        print(f'{n}x{i} = {n*i}')
 
 구구단(9)
