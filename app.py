@@ -1,25 +1,29 @@
-중고차재고 = ['mercedes' , 'tico','bmw']
-if 'tico2' in 중고차재고 : 
-    print('Yup')
-else :
-        print('dd')
+file = open('a.txt','w') #wirte mode #기존 파일이 있어도 덮어쓰기 개념
+file.write('hi')
+file.close()
 
-재고량 = 90
-if  재고량 > 0 : 
-    print('지금 주문 가능합니다')
-else : 
-    print('nono')
+file = open('a.txt', 'a') #append mode 자료추가
+file.write('\nzzzz')  #\n 줄바꿈
+file.close()
 
-for i in 중고차재고 :
-    print( i +' is available')
+file = open('a.txt', 'r') #read mode
+print(file.read())
+file.close()
 
-def hat(a):
-    print(a + 1)
+f = open('data.csv', 'w') #excel file 
+f.write('kim, lee, park')
+f.write('\nkim, lee, park')
+f.close()
 
-hat(3)
+list = ['samsung', 'kakao', 'naver', 'sinpoong']
 
-def hamsu() : 
-    hat(4)
-    return 'gggggg'
+ff = open('list.txt', 'w')
+for i in list:
+    ff.write(i+ '\n')
+ff.close()
 
-print(hamsu())
+def 구구단(n):
+    for i in range(1,10):
+        print(n*i)
+
+구구단(9)
