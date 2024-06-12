@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 # data = requests.get('https://news.naver.com/section/100') #크롤링 할 url data라는 변수에 가져오기
 # soup = BeautifulSoup(data.content, 'html.parser') #soup 문법
@@ -18,11 +19,25 @@ from bs4 import BeautifulSoup
 # 본문 = soup.select('article#dic_area')[0].text
 # print(본문)
 
-data = requests.get('https://finance.naver.com/item/news.naver?code=047050') #크롤링 할 url data라는 변수에 가져오기
+data = requests.get('https://finance.naver.com/item/news_news.nhn?code=005930&page=&sm=title_entity_id.basic&clusterId=') #크롤링 할 url data라는 변수에 가져오기
 soup = BeautifulSoup(data.content, 'html.parser') #soup 문법
 
-헤드라인 = soup.select('td.title')[0] #해석하면 div태그에 class가 "sa_text"의 하위요소 a태그의 하위요소 strong태그에 class가 sa_text_strong인 content
-print(헤드라인['href'])
+base_url = "https://finance.naver.com/item/news_news.nhn?code=005930&page=&sm=title_entity_id.basic&clusterId="  # 실제 페이지 URL의 도메인 부분
+response = requests.get(base_url)
+
+헤드라인 = soup.select('a.tit')[0] #해석하면 div태그에 class가 "sa_text"의 하위요소 a태그의 하위요소 strong태그에 class가 sa_text_strong인 content
+print(헤드라인.text)
+
+링크 = 헤드라인['href']
+absolute_url = urljoin(base_url, 링크)
+print(absolute_url)
+
+본문data = requests.get(absolute_url)
+soup2 = BeautifulSoup(data.content, 'html.parser')
+
+본문 = soup2.select('article#dic_area')
+print(본문)
+
 
 
 
