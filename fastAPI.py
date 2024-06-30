@@ -1,5 +1,5 @@
 from fastapi import FastAPI,Query,Path,Body
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 from pydantic import BaseModel
 
@@ -65,12 +65,12 @@ async def create_item(item: Item):
         item_dict.update({"price_with_tax" : price_with_tax})
     return item_dict
 
-@app.put("/items/{item_id}")
-async def create_item_with_put(item_id : int, item:Item, q:Optional[str] = Query(None, max_length = 10)):
-    result = {"item_id" : item_id, **item.dict()}
-    if q:
-        result.update({"q" : q})
-    return result
+# @app.put("/items/{item_id}")
+# async def create_item_with_put(item_id : int, item:Item, q:Optional[str] = Query(None, max_length = 10)):
+#     result = {"item_id" : item_id, **item.dict()}
+#     if q:
+#         result.update({"q" : q})
+#     return result
 
 #hidden query
 @app.get("/items_hidden")
@@ -88,37 +88,76 @@ async def read_items_validation(
     return results
 
 
-## Body - multiple parameters
+# ## Body - multiple parameters
+
+# class Item2(BaseModel):
+#     name : str
+#     description : Optional[str] = None
+#     price : float
+#     tax : Optional[float] = None
+
+# # class User(BaseModel):
+# #     username : str
+# #     full_name : Optional[str] = None
+
+# # class Importance(BaseModel):
+# #     Importance : int
+
+# @app.put("/items2/{item_id}")
+# async def update_item(
+#     *,
+#     item_id : int = Path(..., title="The ID of the item to get",ge=0,le=150),
+#     q: Optional[str] = None,
+#     item: Item2 = Body(...,embed=True)
+#     # user  : User,
+#     # importance : int = Body(...)
+#     ):
+#     results = {"item_id" : item_id}
+#     if q:
+#         results.update({"q":q})
+#     if item:
+#         results.update({"item" : item})
+#     # if user:
+#     #     results.update({"user": user})
+#     # if importance:
+#     #     results.update({"importance" : importance})
+#     return results     
+
+
+# body - nested models
+
+class Image(BaseModel):
+    url : str
+    name : str
 
 class Item2(BaseModel):
     name : str
     description : Optional[str] = None
     price : float
     tax : Optional[float] = None
+    tags : set[str] = [] ##중복typing 제외
+    image : Optional[Image] = None
+    
 
-# class User(BaseModel):
-#     username : str
-#     full_name : Optional[str] = None
+class Offer(BaseModel):
+    name : str
+    description : Optional[str] = None
+    price: float
+    items: list[Item2]
 
-# class Importance(BaseModel):
-#     Importance : int
+@app.put("/items/{item_id}")
+async def update_item(item_id : int, item : Item2):
+    results = {"item_id" : item_id, "item" : item}
+    return results
 
-@app.put("/items2/{item_id}")
-async def update_item(
-    *,
-    item_id : int = Path(..., title="The ID of the item to get",ge=0,le=150),
-    q: Optional[str] = None,
-    item: Item2 = Body(...,embed=True)
-    # user  : User,
-    # importance : int = Body(...)
-    ):
-    results = {"item_id" : item_id}
-    if q:
-        results.update({"q":q})
-    if item:
-        results.update({"item" : item})
-    # if user:
-    #     results.update({"user": user})
-    # if importance:
-    #     results.update({"importance" : importance})
-    return results     
+@app.post("/offers")
+async def create_offer(offer: Offer):
+    return offer
+
+@app.post("/images/multiple")
+async def create_multiple_images(images : list[Image] = Body(..., embed = True)):
+    return images
+
+@app.post("/blah")
+async def create_some_blahs(blahs : dict[int,float]):
+    return blahs
