@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Query,Path
+from fastapi import FastAPI,Query,Path,Body
 from typing import Optional
 from enum import Enum
 from pydantic import BaseModel
@@ -86,3 +86,39 @@ async def read_items_validation(
     if q:
         results.update({"q":q})
     return results
+
+
+## Body - multiple parameters
+
+class Item2(BaseModel):
+    name : str
+    description : Optional[str] = None
+    price : float
+    tax : Optional[float] = None
+
+# class User(BaseModel):
+#     username : str
+#     full_name : Optional[str] = None
+
+# class Importance(BaseModel):
+#     Importance : int
+
+@app.put("/items2/{item_id}")
+async def update_item(
+    *,
+    item_id : int = Path(..., title="The ID of the item to get",ge=0,le=150),
+    q: Optional[str] = None,
+    item: Item2 = Body(...,embed=True)
+    # user  : User,
+    # importance : int = Body(...)
+    ):
+    results = {"item_id" : item_id}
+    if q:
+        results.update({"q":q})
+    if item:
+        results.update({"item" : item})
+    # if user:
+    #     results.update({"user": user})
+    # if importance:
+    #     results.update({"importance" : importance})
+    return results     
