@@ -1,7 +1,7 @@
 from fastapi import FastAPI,Query,Path,Body
 from typing import Optional, List
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 app = FastAPI()
 
@@ -126,38 +126,61 @@ async def read_items_validation(
 
 # body - nested models
 
-class Image(BaseModel):
-    url : str
-    name : str
+# class Image(BaseModel):
+#     url : str
+#     name : str
 
-class Item2(BaseModel):
-    name : str
-    description : Optional[str] = None
-    price : float
-    tax : Optional[float] = None
-    tags : set[str] = [] ##중복typing 제외
-    image : Optional[Image] = None
+# class Item2(BaseModel):
+#     name : str
+#     description : Optional[str] = None
+#     price : float
+#     tax : Optional[float] = None
+#     tags : set[str] = [] ##중복typing 제외
+#     image : Optional[Image] = None
     
 
-class Offer(BaseModel):
-    name : str
-    description : Optional[str] = None
-    price: float
-    items: list[Item2]
+# class Offer(BaseModel):
+#     name : str
+#     description : Optional[str] = None
+#     price: float
+#     items: list[Item2]
+
+# @app.put("/items/{item_id}")
+# async def update_item(item_id : int, item : Item2):
+#     results = {"item_id" : item_id, "item" : item}
+#     return results
+
+# @app.post("/offers")
+# async def create_offer(offer: Offer):
+#     return offer
+
+# @app.post("/images/multiple")
+# async def create_multiple_images(images : list[Image] = Body(..., embed = True)):
+#     return images
+
+# @app.post("/blah")
+# async def create_some_blahs(blahs : dict[int,float]):
+#     return blahs
+
+# Declare Request Example Data
+class Item2(BaseModel):
+    name : str = Field(..., example = "Foo")
+    description : Optional[str] = Field(None, example="A very nice Item")
+    price : float = Field(..., exameple = 16.25)
+    tax : Optional[float] = Field(None, example = 1.67)
+
+#아래 주석을 헤제하고 위의 Filed를 없애는 경우와 같은 결과
+    # class Config:
+    #     json_schema_extra ={
+    #         "example" : {
+    #             "name" : "Foo",
+    #             "description" : "A very nice Item",
+    #             "price" : 16.25,
+    #             "tax" : 1.67
+    #         }
+    #     }
 
 @app.put("/items/{item_id}")
 async def update_item(item_id : int, item : Item2):
     results = {"item_id" : item_id, "item" : item}
     return results
-
-@app.post("/offers")
-async def create_offer(offer: Offer):
-    return offer
-
-@app.post("/images/multiple")
-async def create_multiple_images(images : list[Image] = Body(..., embed = True)):
-    return images
-
-@app.post("/blah")
-async def create_some_blahs(blahs : dict[int,float]):
-    return blahs
